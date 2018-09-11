@@ -4,11 +4,11 @@ import (
 	"context"
 	"testing"
 
-	. "github.com/ipfs/go-merkledag"
-	dstest "github.com/ipfs/go-merkledag/test"
+	. "github.com/dms3-fs/go-merkledag"
+	dstest "github.com/dms3-fs/go-merkledag/test"
 
-	cid "github.com/ipfs/go-cid"
-	ipld "github.com/ipfs/go-ipld-format"
+	cid "github.com/dms3-fs/go-cid"
+	dms3ld "github.com/dms3-fs/go-ld-format"
 )
 
 func TestReadonlyProperties(t *testing.T) {
@@ -16,7 +16,7 @@ func TestReadonlyProperties(t *testing.T) {
 	ro := NewReadOnlyDagService(ds)
 
 	ctx := context.Background()
-	nds := []ipld.Node{
+	nds := []dms3ld.Node{
 		NewRawNode([]byte("foo1")),
 		NewRawNode([]byte("foo2")),
 		NewRawNode([]byte("foo3")),
@@ -55,7 +55,7 @@ func TestReadonlyProperties(t *testing.T) {
 		t.Fatal("expected ErrReadOnly")
 	}
 
-	if _, err := ro.Get(ctx, cids[0]); err != ipld.ErrNotFound {
+	if _, err := ro.Get(ctx, cids[0]); err != dms3ld.ErrNotFound {
 		t.Fatal("expected ErrNotFound")
 	}
 	if _, err := ro.Get(ctx, cids[3]); err != nil {

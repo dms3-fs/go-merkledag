@@ -6,10 +6,10 @@ import (
 	"fmt"
 	"testing"
 
-	mdag "github.com/ipfs/go-merkledag"
-	mdagtest "github.com/ipfs/go-merkledag/test"
+	mdag "github.com/dms3-fs/go-merkledag"
+	mdagtest "github.com/dms3-fs/go-merkledag/test"
 
-	ipld "github.com/ipfs/go-ipld-format"
+	dms3ld "github.com/dms3-fs/go-ld-format"
 )
 
 func TestDFSPreNoSkip(t *testing.T) {
@@ -324,7 +324,7 @@ func TestBFSSkip(t *testing.T) {
 `))
 }
 
-func testWalkOutputs(t *testing.T, root ipld.Node, opts Options, expect []byte) {
+func testWalkOutputs(t *testing.T, root dms3ld.Node, opts Options, expect []byte) {
 	expect = bytes.TrimLeft(expect, "\n")
 
 	buf := new(bytes.Buffer)
@@ -351,7 +351,7 @@ func testWalkOutputs(t *testing.T, root ipld.Node, opts Options, expect []byte) 
 	}
 }
 
-func newFan(t *testing.T, ds ipld.DAGService) ipld.Node {
+func newFan(t *testing.T, ds dms3ld.DAGService) dms3ld.Node {
 	a := mdag.NodeWithData([]byte("/a"))
 	addLink(t, ds, a, child(t, ds, a, "aa"))
 	addLink(t, ds, a, child(t, ds, a, "ab"))
@@ -360,7 +360,7 @@ func newFan(t *testing.T, ds ipld.DAGService) ipld.Node {
 	return a
 }
 
-func newLinkedList(t *testing.T, ds ipld.DAGService) ipld.Node {
+func newLinkedList(t *testing.T, ds dms3ld.DAGService) dms3ld.Node {
 	a := mdag.NodeWithData([]byte("/a"))
 	aa := child(t, ds, a, "aa")
 	aaa := child(t, ds, aa, "aaa")
@@ -373,7 +373,7 @@ func newLinkedList(t *testing.T, ds ipld.DAGService) ipld.Node {
 	return a
 }
 
-func newBinaryTree(t *testing.T, ds ipld.DAGService) ipld.Node {
+func newBinaryTree(t *testing.T, ds dms3ld.DAGService) dms3ld.Node {
 	a := mdag.NodeWithData([]byte("/a"))
 	aa := child(t, ds, a, "aa")
 	ab := child(t, ds, a, "ab")
@@ -386,7 +386,7 @@ func newBinaryTree(t *testing.T, ds ipld.DAGService) ipld.Node {
 	return a
 }
 
-func newBinaryDAG(t *testing.T, ds ipld.DAGService) ipld.Node {
+func newBinaryDAG(t *testing.T, ds dms3ld.DAGService) dms3ld.Node {
 	a := mdag.NodeWithData([]byte("/a"))
 	aa := child(t, ds, a, "aa")
 	aaa := child(t, ds, aa, "aaa")
@@ -403,7 +403,7 @@ func newBinaryDAG(t *testing.T, ds ipld.DAGService) ipld.Node {
 	return a
 }
 
-func addLink(t *testing.T, ds ipld.DAGService, a, b ipld.Node) {
+func addLink(t *testing.T, ds dms3ld.DAGService, a, b dms3ld.Node) {
 	to := string(a.(*mdag.ProtoNode).Data()) + "2" + string(b.(*mdag.ProtoNode).Data())
 	if err := ds.Add(context.Background(), b); err != nil {
 		t.Error(err)
@@ -413,6 +413,6 @@ func addLink(t *testing.T, ds ipld.DAGService, a, b ipld.Node) {
 	}
 }
 
-func child(t *testing.T, ds ipld.DAGService, a ipld.Node, name string) ipld.Node {
+func child(t *testing.T, ds dms3ld.DAGService, a dms3ld.Node, name string) dms3ld.Node {
 	return mdag.NodeWithData([]byte(string(a.(*mdag.ProtoNode).Data()) + "/" + name))
 }

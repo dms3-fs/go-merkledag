@@ -13,23 +13,23 @@ import (
 	"testing"
 	"time"
 
-	. "github.com/ipfs/go-merkledag"
-	mdpb "github.com/ipfs/go-merkledag/pb"
-	dstest "github.com/ipfs/go-merkledag/test"
+	. "github.com/dms3-fs/go-merkledag"
+	mdpb "github.com/dms3-fs/go-merkledag/pb"
+	dstest "github.com/dms3-fs/go-merkledag/test"
 
-	blocks "github.com/ipfs/go-block-format"
-	bserv "github.com/ipfs/go-blockservice"
-	bstest "github.com/ipfs/go-blockservice/test"
-	cid "github.com/ipfs/go-cid"
-	offline "github.com/ipfs/go-ipfs-exchange-offline"
-	u "github.com/ipfs/go-ipfs-util"
-	ipld "github.com/ipfs/go-ipld-format"
+	blocks "github.com/dms3-fs/go-block-format"
+	bserv "github.com/dms3-fs/go-blockservice"
+	bstest "github.com/dms3-fs/go-blockservice/test"
+	cid "github.com/dms3-fs/go-cid"
+	offline "github.com/dms3-fs/go-fs-exchange-offline"
+	u "github.com/dms3-fs/go-fs-util"
+	dms3ld "github.com/dms3-fs/go-ld-format"
 )
 
 // makeDepthTestingGraph makes a small DAG with two levels. The level-two
 // nodes are both children of the root and of one of the level 1 nodes.
 // This is meant to test the EnumerateChildren*Depth functions.
-func makeDepthTestingGraph(t *testing.T, ds ipld.DAGService) ipld.Node {
+func makeDepthTestingGraph(t *testing.T, ds dms3ld.DAGService) dms3ld.Node {
 	root := NodeWithData(nil)
 	l11 := NodeWithData([]byte("leve1_node1"))
 	l12 := NodeWithData([]byte("leve1_node2"))
@@ -46,7 +46,7 @@ func makeDepthTestingGraph(t *testing.T, ds ipld.DAGService) ipld.Node {
 	root.AddNodeLink(l23.Cid().String(), l23)
 
 	ctx := context.Background()
-	for _, n := range []ipld.Node{l23, l22, l21, l12, l11, root} {
+	for _, n := range []dms3ld.Node{l23, l22, l21, l12, l11, root} {
 		err := ds.Add(ctx, n)
 		if err != nil {
 			t.Fatal(err)
@@ -57,7 +57,7 @@ func makeDepthTestingGraph(t *testing.T, ds ipld.DAGService) ipld.Node {
 }
 
 // Check that all children of root are in the given set and in the datastore
-func traverseAndCheck(t *testing.T, root ipld.Node, ds ipld.DAGService, hasF func(c *cid.Cid) bool) {
+func traverseAndCheck(t *testing.T, root dms3ld.Node, ds dms3ld.DAGService, hasF func(c *cid.Cid) bool) {
 	// traverse dag and check
 	for _, lnk := range root.Links() {
 		c := lnk.Cid
@@ -131,7 +131,7 @@ func SubtestNodeStat(t *testing.T, n *ProtoNode) {
 
 	k := n.Cid()
 
-	expected := ipld.NodeStat{
+	expected := dms3ld.NodeStat{
 		NumLinks:       len(n.Links()),
 		BlockSize:      len(enc),
 		LinksSize:      len(enc) - len(n.Data()), // includes framing.
@@ -176,7 +176,7 @@ func TestBatchFetchDupBlock(t *testing.T) {
 // First, a node is created from each 512 bytes of data from the reader
 // (like a the Size chunker would do). Then all nodes are added as children
 // to a root node, which is returned.
-func makeTestDAG(t *testing.T, read io.Reader, ds ipld.DAGService) ipld.Node {
+func makeTestDAG(t *testing.T, read io.Reader, ds dms3ld.DAGService) dms3ld.Node {
 	p := make([]byte, 512)
 	nodes := []*ProtoNode{}
 
@@ -217,7 +217,7 @@ func makeTestDAG(t *testing.T, read io.Reader, ds ipld.DAGService) ipld.Node {
 
 // makeTestDAGReader takes the root node as returned by makeTestDAG and
 // provides a reader that reads all the RawData from that node and its children.
-func makeTestDAGReader(t *testing.T, root ipld.Node, ds ipld.DAGService) io.Reader {
+func makeTestDAGReader(t *testing.T, root dms3ld.Node, ds dms3ld.DAGService) io.Reader {
 	ctx := context.Background()
 	buf := new(bytes.Buffer)
 	buf.Write(root.RawData())
@@ -236,7 +236,7 @@ func makeTestDAGReader(t *testing.T, root ipld.Node, ds ipld.DAGService) io.Read
 
 func runBatchFetchTest(t *testing.T, read io.Reader) {
 	ctx := context.Background()
-	var dagservs []ipld.DAGService
+	var dagservs []dms3ld.DAGService
 	for _, bsi := range bstest.Mocks(5) {
 		dagservs = append(dagservs, NewDAGService(bsi))
 	}
@@ -314,7 +314,7 @@ func TestCantGet(t *testing.T) {
 }
 
 func TestFetchGraph(t *testing.T) {
-	var dservs []ipld.DAGService
+	var dservs []dms3ld.DAGService
 	bsis := bstest.Mocks(2)
 	for _, bsi := range bsis {
 		dservs = append(dservs, NewDAGService(bsi))
@@ -354,7 +354,7 @@ func TestFetchGraphWithDepthLimit(t *testing.T) {
 	}
 
 	testF := func(t *testing.T, tc testcase) {
-		var dservs []ipld.DAGService
+		var dservs []dms3ld.DAGService
 		bsis := bstest.Mocks(2)
 		for _, bsi := range bsis {
 			dservs = append(dservs, NewDAGService(bsi))
@@ -449,7 +449,7 @@ func TestFetchFailure(t *testing.T) {
 		}
 	}
 
-	getters := ipld.GetDAG(ctx, ds, top)
+	getters := dms3ld.GetDAG(ctx, ds, top)
 	for i, getter := range getters {
 		_, err := getter.Get(ctx)
 		if err != nil && i < 10 {
@@ -565,7 +565,7 @@ func TestGetRawNodes(t *testing.T) {
 func TestProtoNodeResolve(t *testing.T) {
 
 	nd := new(ProtoNode)
-	nd.SetLinks([]*ipld.Link{{Name: "foo"}})
+	nd.SetLinks([]*dms3ld.Link{{Name: "foo"}})
 
 	lnk, left, err := nd.ResolveLink([]string{"foo", "bar"})
 	if err != nil {
@@ -679,7 +679,7 @@ func TestEnumerateAsyncFailsNotFound(t *testing.T) {
 	d := NodeWithData([]byte("foo4"))
 
 	ds := dstest.Mock()
-	for _, n := range []ipld.Node{a, b, c} {
+	for _, n := range []dms3ld.Node{a, b, c} {
 		err := ds.Add(ctx, n)
 		if err != nil {
 			t.Fatal(err)
@@ -742,7 +742,7 @@ func testProgressIndicator(t *testing.T, depth int) {
 	}
 }
 
-func mkDag(ds ipld.DAGService, depth int) (*cid.Cid, int) {
+func mkDag(ds dms3ld.DAGService, depth int) (*cid.Cid, int) {
 	ctx := context.Background()
 
 	totalChildren := 0

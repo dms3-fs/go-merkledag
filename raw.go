@@ -2,11 +2,11 @@ package merkledag
 
 import (
 	"fmt"
-	"github.com/ipfs/go-block-format"
+	"github.com/dms3-fs/go-block-format"
 
-	cid "github.com/ipfs/go-cid"
-	u "github.com/ipfs/go-ipfs-util"
-	ipld "github.com/ipfs/go-ipld-format"
+	cid "github.com/dms3-fs/go-cid"
+	u "github.com/dms3-fs/go-fs-util"
+	dms3ld "github.com/dms3-fs/go-ld-format"
 )
 
 // RawNode represents a node which only contains data.
@@ -23,8 +23,8 @@ func NewRawNode(data []byte) *RawNode {
 	return &RawNode{blk}
 }
 
-// DecodeRawBlock is a block decoder for raw IPLD nodes conforming to `node.DecodeBlockFunc`.
-func DecodeRawBlock(block blocks.Block) (ipld.Node, error) {
+// DecodeRawBlock is a block decoder for raw DMS3LD nodes conforming to `node.DecodeBlockFunc`.
+func DecodeRawBlock(block blocks.Block) (dms3ld.Node, error) {
 	if block.Cid().Type() != cid.Raw {
 		return nil, fmt.Errorf("raw nodes cannot be decoded from non-raw blocks: %d", block.Cid().Type())
 	}
@@ -32,7 +32,7 @@ func DecodeRawBlock(block blocks.Block) (ipld.Node, error) {
 	return &RawNode{block}, nil
 }
 
-var _ ipld.DecodeBlockFunc = DecodeRawBlock
+var _ dms3ld.DecodeBlockFunc = DecodeRawBlock
 
 // NewRawNodeWPrefix creates a RawNode using the provided cid builder
 func NewRawNodeWPrefix(data []byte, builder cid.Builder) (*RawNode, error) {
@@ -49,12 +49,12 @@ func NewRawNodeWPrefix(data []byte, builder cid.Builder) (*RawNode, error) {
 }
 
 // Links returns nil.
-func (rn *RawNode) Links() []*ipld.Link {
+func (rn *RawNode) Links() []*dms3ld.Link {
 	return nil
 }
 
 // ResolveLink returns an error.
-func (rn *RawNode) ResolveLink(path []string) (*ipld.Link, []string, error) {
+func (rn *RawNode) ResolveLink(path []string) (*dms3ld.Link, []string, error) {
 	return nil, nil, ErrLinkNotFound
 }
 
@@ -68,8 +68,8 @@ func (rn *RawNode) Tree(p string, depth int) []string {
 	return nil
 }
 
-// Copy performs a deep copy of this node and returns it as an ipld.Node
-func (rn *RawNode) Copy() ipld.Node {
+// Copy performs a deep copy of this node and returns it as an dms3ld.Node
+func (rn *RawNode) Copy() dms3ld.Node {
 	copybuf := make([]byte, len(rn.RawData()))
 	copy(copybuf, rn.RawData())
 	nblk, err := blocks.NewBlockWithCid(rn.RawData(), rn.Cid())
@@ -87,11 +87,11 @@ func (rn *RawNode) Size() (uint64, error) {
 }
 
 // Stat returns some Stats about this node.
-func (rn *RawNode) Stat() (*ipld.NodeStat, error) {
-	return &ipld.NodeStat{
+func (rn *RawNode) Stat() (*dms3ld.NodeStat, error) {
+	return &dms3ld.NodeStat{
 		CumulativeSize: len(rn.RawData()),
 		DataSize:       len(rn.RawData()),
 	}, nil
 }
 
-var _ ipld.Node = (*RawNode)(nil)
+var _ dms3ld.Node = (*RawNode)(nil)

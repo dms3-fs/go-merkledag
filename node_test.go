@@ -5,17 +5,17 @@ import (
 	"context"
 	"testing"
 
-	. "github.com/ipfs/go-merkledag"
-	mdtest "github.com/ipfs/go-merkledag/test"
+	. "github.com/dms3-fs/go-merkledag"
+	mdtest "github.com/dms3-fs/go-merkledag/test"
 
-	cid "github.com/ipfs/go-cid"
-	ipld "github.com/ipfs/go-ipld-format"
+	cid "github.com/dms3-fs/go-cid"
+	dms3ld "github.com/dms3-fs/go-ld-format"
 )
 
 func TestStableCID(t *testing.T) {
 	nd := &ProtoNode{}
 	nd.SetData([]byte("foobar"))
-	nd.SetLinks([]*ipld.Link{
+	nd.SetLinks([]*dms3ld.Link{
 		{Name: "a"},
 		{Name: "b"},
 		{Name: "c"},
@@ -31,7 +31,7 @@ func TestStableCID(t *testing.T) {
 
 func TestRemoveLink(t *testing.T) {
 	nd := &ProtoNode{}
-	nd.SetLinks([]*ipld.Link{
+	nd.SetLinks([]*dms3ld.Link{
 		{Name: "a"},
 		{Name: "b"},
 		{Name: "a"},
@@ -59,7 +59,7 @@ func TestRemoveLink(t *testing.T) {
 
 	// should fail
 	err = nd.RemoveNodeLink("a")
-	if err != ipld.ErrNotFound {
+	if err != dms3ld.ErrNotFound {
 		t.Fatal("should have failed to remove link")
 	}
 
@@ -90,7 +90,7 @@ func TestFindLink(t *testing.T) {
 	kEmpty := ndEmpty.Cid()
 
 	nd := &ProtoNode{}
-	nd.SetLinks([]*ipld.Link{
+	nd.SetLinks([]*dms3ld.Link{
 		{Name: "a", Cid: kEmpty},
 		{Name: "c", Cid: kEmpty},
 		{Name: "b", Cid: kEmpty},
@@ -137,7 +137,7 @@ func TestFindLink(t *testing.T) {
 
 func TestNodeCopy(t *testing.T) {
 	nd := &ProtoNode{}
-	nd.SetLinks([]*ipld.Link{
+	nd.SetLinks([]*dms3ld.Link{
 		{Name: "a"},
 		{Name: "c"},
 		{Name: "b"},
@@ -155,7 +155,7 @@ func TestNodeCopy(t *testing.T) {
 
 func TestJsonRoundtrip(t *testing.T) {
 	nd := new(ProtoNode)
-	nd.SetLinks([]*ipld.Link{
+	nd.SetLinks([]*dms3ld.Link{
 		{Name: "a"},
 		{Name: "c"},
 		{Name: "b"},

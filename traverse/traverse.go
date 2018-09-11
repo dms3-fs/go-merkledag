@@ -5,7 +5,7 @@ import (
 	"context"
 	"errors"
 
-	ipld "github.com/ipfs/go-ipld-format"
+	dms3ld "github.com/dms3-fs/go-ld-format"
 )
 
 // Order is an identifier for traversal algorithm orders
@@ -23,7 +23,7 @@ const (
 
 // Options specifies a series of traversal options
 type Options struct {
-	DAG     ipld.NodeGetter // the dagservice to fetch nodes
+	DAG     dms3ld.NodeGetter // the dagservice to fetch nodes
 	Order   Order           // what order to traverse in
 	Func    Func            // the function to perform at each step
 	ErrFunc ErrFunc         // see ErrFunc. Optional
@@ -33,7 +33,7 @@ type Options struct {
 
 // State is a current traversal state
 type State struct {
-	Node  ipld.Node
+	Node  dms3ld.Node
 	Depth int
 }
 
@@ -42,7 +42,7 @@ type traversal struct {
 	seen map[string]struct{}
 }
 
-func (t *traversal) shouldSkip(n ipld.Node) (bool, error) {
+func (t *traversal) shouldSkip(n dms3ld.Node) (bool, error) {
 	if t.opts.SkipDuplicates {
 		k := n.Cid()
 		if _, found := t.seen[k.KeyString()]; found {
@@ -62,9 +62,9 @@ func (t *traversal) callFunc(next State) error {
 // stop processing. if it returns a nil node, just skip it.
 //
 // the error handling is a little complicated.
-func (t *traversal) getNode(link *ipld.Link) (ipld.Node, error) {
+func (t *traversal) getNode(link *dms3ld.Link) (dms3ld.Node, error) {
 
-	getNode := func(l *ipld.Link) (ipld.Node, error) {
+	getNode := func(l *dms3ld.Link) (dms3ld.Node, error) {
 		next, err := l.GetNode(context.TODO(), t.opts.DAG)
 		if err != nil {
 			return nil, err
@@ -104,7 +104,7 @@ type ErrFunc func(err error) error
 
 // Traverse initiates a DAG traversal with the given options starting at
 // the given root.
-func Traverse(root ipld.Node, o Options) error {
+func Traverse(root dms3ld.Node, o Options) error {
 	t := traversal{
 		opts: o,
 		seen: map[string]struct{}{},

@@ -1,18 +1,18 @@
 package mdutils
 
 import (
-	dag "github.com/ipfs/go-merkledag"
+	dag "github.com/dms3-fs/go-merkledag"
 
-	bsrv "github.com/ipfs/go-blockservice"
-	ds "github.com/ipfs/go-datastore"
-	dssync "github.com/ipfs/go-datastore/sync"
-	blockstore "github.com/ipfs/go-ipfs-blockstore"
-	offline "github.com/ipfs/go-ipfs-exchange-offline"
-	ipld "github.com/ipfs/go-ipld-format"
+	bsrv "github.com/dms3-fs/go-blockservice"
+	ds "github.com/dms3-fs/go-datastore"
+	dssync "github.com/dms3-fs/go-datastore/sync"
+	blockstore "github.com/dms3-fs/go-fs-blockstore"
+	offline "github.com/dms3-fs/go-fs-exchange-offline"
+	dms3ld "github.com/dms3-fs/go-ld-format"
 )
 
 // Mock returns a new thread-safe, mock DAGService.
-func Mock() ipld.DAGService {
+func Mock() dms3ld.DAGService {
 	return dag.NewDAGService(Bserv())
 }
 

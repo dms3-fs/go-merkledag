@@ -5,12 +5,12 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/ipfs/go-block-format"
+	"github.com/dms3-fs/go-block-format"
 
-	pb "github.com/ipfs/go-merkledag/pb"
+	pb "github.com/dms3-fs/go-merkledag/pb"
 
-	cid "github.com/ipfs/go-cid"
-	ipld "github.com/ipfs/go-ipld-format"
+	cid "github.com/dms3-fs/go-cid"
+	dms3ld "github.com/dms3-fs/go-ld-format"
 )
 
 // Make sure the user doesn't upgrade this file.
@@ -30,9 +30,9 @@ func (n *ProtoNode) unmarshal(encoded []byte) error {
 	}
 
 	pbnl := pbn.GetLinks()
-	n.links = make([]*ipld.Link, len(pbnl))
+	n.links = make([]*dms3ld.Link, len(pbnl))
 	for i, l := range pbnl {
-		n.links[i] = &ipld.Link{Name: l.GetName(), Size: l.GetTsize()}
+		n.links[i] = &dms3ld.Link{Name: l.GetName(), Size: l.GetTsize()}
 		c, err := cid.Cast(l.GetHash())
 		if err != nil {
 			return fmt.Errorf("link hash #%d is not valid multihash. %v", i, err)
@@ -114,9 +114,9 @@ func DecodeProtobuf(encoded []byte) (*ProtoNode, error) {
 	return n, nil
 }
 
-// DecodeProtobufBlock is a block decoder for protobuf IPLD nodes conforming to
+// DecodeProtobufBlock is a block decoder for protobuf DMS3LD nodes conforming to
 // node.DecodeBlockFunc
-func DecodeProtobufBlock(b blocks.Block) (ipld.Node, error) {
+func DecodeProtobufBlock(b blocks.Block) (dms3ld.Node, error) {
 	c := b.Cid()
 	if c.Type() != cid.DagProtobuf {
 		return nil, fmt.Errorf("this function can only decode protobuf nodes")
@@ -136,4 +136,4 @@ func DecodeProtobufBlock(b blocks.Block) (ipld.Node, error) {
 }
 
 // Type assertion
-var _ ipld.DecodeBlockFunc = DecodeProtobufBlock
+var _ dms3ld.DecodeBlockFunc = DecodeProtobufBlock
